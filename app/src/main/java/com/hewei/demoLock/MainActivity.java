@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private MaterialButton btnStop;
     private MaterialButton btnPreview;
     private MaterialButton btnPromptFlow;
+    private MaterialButton btnPermissions;
     private TextView tvStatus;
     private Handler timeHandler;
     private Runnable timeRunnable;
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         btnStop = findViewById(R.id.btnStop);
         btnPreview = findViewById(R.id.btnPreview);
         btnPromptFlow = findViewById(R.id.btnPromptFlow);
+        btnPermissions = findViewById(R.id.btnPermissions);
         tvStatus = findViewById(R.id.tvStatus);
     }
 
@@ -72,9 +74,13 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            // 启动锁屏服务（使用普通服务，不需要前台通知）
+            // 启动锁屏服务（前台服务，保持后台运行）
             Intent serviceIntent = new Intent(this, LockScreenService.class);
-            startService(serviceIntent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(serviceIntent);
+            } else {
+                startService(serviceIntent);
+            }
 
             Toast.makeText(this, "锁屏服务已启动", Toast.LENGTH_SHORT).show();
             updateServiceStatus();
@@ -99,6 +105,12 @@ public class MainActivity extends AppCompatActivity {
         btnPromptFlow.setOnClickListener(v -> {
             Intent promptFlowIntent = new Intent(this, PromptFlowActivity.class);
             startActivity(promptFlowIntent);
+        });
+
+        // 权限设置
+        btnPermissions.setOnClickListener(v -> {
+            Intent permissionsIntent = new Intent(this, PermissionsActivity.class);
+            startActivity(permissionsIntent);
         });
     }
 
